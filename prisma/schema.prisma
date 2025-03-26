@@ -14,7 +14,93 @@ datasource db {
 }
 
 model User {
-  id    Int     @id @default(autoincrement())
-  name  String
-  email String  @unique
+  id            String          @id @default(uuid())
+  email         String          @unique
+  password      String
+  createdAt     DateTime        @default(now())
+  compains      Compain[]
+  Party         Party[]
+  MainCharacter MainCharacter[]
+  Character     Character[]
 }
+
+model Compain {
+  id             String          @id @default(uuid())
+  self           Int             @unique @default(dbgenerated("floor(random() * 1000000)::int"))
+  title          String
+  description    String
+  parties        Party[]
+  mainCharacters MainCharacter[]
+  characters     Character[]
+  createdAt      DateTime        @default(now())
+  userId         String
+  user           User            @relation(fields: [userId], references: [id])
+}
+
+model Party {
+  id             String               @id @default(uuid())
+  self           Int                  @unique @default(dbgenerated("floor(random() * 1000000)::int"))
+  title          String
+  description    String
+  compainId      String
+  compain        Compain              @relation(fields: [compainId], references: [id])
+  log            String?
+  characters     PartyCharacter[]
+  mainCharacters PartyMainCharacter[]
+  createdAt      DateTime             @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+}
+
+model MainCharacter {
+  id                 String               @id @default(uuid())
+  compainId          String
+  compain            Compain              @relation(fields: [compainId], references: [id])
+  name               String
+  partyMainCharacter PartyMainCharacter[]
+  userId             String
+  user               User                 @relation(fields: [userId], references: [id])
+}
+
+model Character {
+  id             String           @id @default(uuid())
+  compainId      String
+  compain        Compain          @relation(fields: [compainId], references: [id])
+  name           String
+  PartyCharacter PartyCharacter[]
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+}
+
+model PartyCharacter {
+  partyId     String
+  characterId String
+  party       Party     @relation(fields: [partyId], references: [id])
+  character   Character @relation(fields: [characterId], references: [id])
+
+  @@id([partyId, characterId])
+}
+
+model PartyMainCharacter {
+  partyId         String
+  mainCharacterId String
+  party           Party         @relation(fields: [partyId], references: [id])
+  mainCharacter   MainCharacter @relation(fields: [mainCharacterId], references: [id])
+
+  @@id([partyId, mainCharacterId])
+}
+
+// model Log {
+//   id        String   @id @default(uuid())
+//   log String
+
+//   createdAt DateTime @default(now())
+// }
+
+// model  {
+//   id    Int     @id @default(autoincrement())
+//   name  String
+//   email String  @unique
+// }

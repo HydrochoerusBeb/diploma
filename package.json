@@ -9,8 +9,17 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@heroui/form": "^2.1.12",
+    "@heroui/react": "^2.7.2",
+    "@heroui/system": "^2.4.10",
+    "@heroui/theme": "^2.4.9",
     "@prisma/client": "^6.3.1",
     "axios": "^1.7.9",
+    "bcrypt": "^5.1.1",
+    "framer-motion": "^12.4.7",
+    "jose": "^6.0.8",
+    "jsonwebtoken": "^9.0.2",
+    "jwt-decode": "^4.0.0",
     "next": "15.1.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -18,6 +27,8 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/bcrypt": "^5.0.2",
+    "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
