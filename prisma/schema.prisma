@@ -63,6 +63,7 @@ model MainCharacter {
   description String // Описание
   avatar      Bytes? // Аватарка (может быть null)
   level       Int // Уровень
+  alive       Boolean @default(true)
 
   partyMainCharacter PartyMainCharacter[]
   userId             String
@@ -78,6 +79,7 @@ model Character {
   race           String           @default("Unknown")
   description    String
   avatar         Bytes?
+  alive          Boolean          @default(true)
   location       String
   occupation     String           @default("Unknown")
   level          Int
