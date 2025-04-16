@@ -54,15 +54,15 @@ model Party {
 }
 
 model MainCharacter {
-  id                 String               @id @default(uuid())
-  compainId          String
-  compain            Compain              @relation(fields: [compainId], references: [id])
-  name               String
-  class              String               // Класс персонажа
-  race               String               // Раса
-  description        String               // Описание
-  avatarUrl          String?              // Аватарка (может быть null)
-  level              Int                  // Уровень
+  id          String  @id @default(uuid())
+  compainId   String
+  compain     Compain @relation(fields: [compainId], references: [id])
+  name        String
+  class       String // Класс персонажа
+  race        String // Раса
+  description String // Описание
+  avatar      Bytes? // Аватарка (может быть null)
+  level       Int // Уровень
 
   partyMainCharacter PartyMainCharacter[]
   userId             String
@@ -74,17 +74,18 @@ model Character {
   compainId      String
   compain        Compain          @relation(fields: [compainId], references: [id])
   name           String
-  class          String?           
-  race           String           @default("Unknown") 
-  description    String          
-  avatarUrl      String?          
-  location       String           
-  occupation     String           @default("Unknown") 
-  level          Int              
+  class          String?
+  race           String           @default("Unknown")
+  description    String
+  avatar         Bytes?
+  location       String
+  occupation     String           @default("Unknown")
+  level          Int
   PartyCharacter PartyCharacter[]
   userId         String
   user           User             @relation(fields: [userId], references: [id])
 }
+
 model PartyCharacter {
   partyId     String
   characterId String
