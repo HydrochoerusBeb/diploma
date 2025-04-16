@@ -1,64 +1,161 @@
-"use client";
+// // app/page.js
+// 'use client';
 
-import { getSession } from "@/actions/auth";
-import {
-  getParty,
-} from "@/actions/companyActions";  
-import { PartyType } from "@/utils/types/PartyType";
-import { SessionPayload } from "@/utils/types/SessionPayload";
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+// import { useState, useEffect } from 'react';
+// import {
+//   sendLog,
+//   fetchLogs,
+//   fetchTimer,
+//   pauseTimer,
+//   resumeTimer,
+//   downloadLogsAsJson,
+//   createLogContainer,
+// } from '@/actions/party';
 
-export const TestCompany = {
-  title: "test company",
-  partiesCount: 2,
-  parties: [
-    {
-      id: 1,
-      name: "party 1",
-      characterCount: 15,
-      mainCharacters: 4,
-    },
-    {},
-  ],
-};
+// export default function LogPage() {
+//   const [logs, setLogs] = useState([]);
+//   const [logInput, setLogInput] = useState('');
+//   const [timer, setTimer] = useState({ elapsedSeconds: 0, isRunning: false });
+//   const [config, setConfig] = useState({
+//     title: '',
+//     description: '',
+//     compainId: '',
+//     userId: '',
+//   });
+//   const [partyId, setPartyId] = useState('');
+//   const [isLoading, setIsLoading] = useState(false);
 
-export default function PartyPage() {
-  const [party, setParty] = useState<PartyType | null>(null);
-  const [user, setUser] = useState<SessionPayload | null>(null);
-  const params = useParams();
+//   useEffect(() => {
+//     const interval = setInterval(async () => {
+//       const t = await fetchTimer();
+//       setTimer(t);
+//     }, 1000);
 
-  useEffect(() => {
-    async function fetchUser() {
-      const session = await getSession();
-      console.log("Fetched session:", session);
-      if (session) {
-        setUser(session as SessionPayload);
-      } else {
-        setUser(null);
-      }
-    }
-    fetchUser();
-  }, []);
+//     fetchLogs().then(setLogs);
 
-  useEffect(() => {
-    async function fetchParty() {
-      const data = await getParty({
-        id: Number(params.id),
-        userId: user!.id,
-      });
-      console.log(data);
+//     return () => clearInterval(interval);
+//   }, []);
 
-      setParty(data);
-    }
-    fetchParty();
+//   const handleSendLog = async () => {
+//     const log = { message: logInput, time: new Date().toISOString() };
+//     await sendLog(log);
+//     const updated = await fetchLogs();
+//     setLogs(updated);
+//     setLogInput('');
+//   };
 
-    console.log(party);
-  }, [user]);
+//   const handleDownloadLogs = async () => {
+//     if (!partyId) return alert('Укажи partyId');
+//     const updatedLogs = await fetchLogs();
+//     const url = await downloadLogsAsJson(partyId, updatedLogs);
+//     window.open(url, '_blank');
+//   };
 
-  return (
-    <div className="flex w-full h-full ">
-      <h2>{party?.title}</h2>
-    </div>
-  );
-}
+//   const handleCreateContainer = async () => {
+//     setIsLoading(true);
+//     try {
+//       await createLogContainer({
+//         timer: { isRunning: true, elapsedSeconds: 0 },
+//         logs: [],
+//         ...config,
+//       });
+//       alert('Контейнер создан!');
+//     } catch (err) {
+//       alert('Ошибка создания контейнера');
+//       console.error(err);
+//     }
+//     setIsLoading(false);
+//   };
+
+//   return (
+//     <main className="max-w-2xl mx-auto p-4 space-y-4">
+//       <h1 className="text-2xl font-bold">Логирование сессии</h1>
+
+//       <div className="space-y-2">
+//         <input
+//           type="text"
+//           placeholder="Название партии"
+//           className="w-full p-2 border rounded text-black"
+//           value={config.title}
+//           onChange={(e) => setConfig({ ...config, title: e.target.value })}
+//         />
+//         <textarea
+//           placeholder="Описание"
+//           className="w-full p-2 border rounded text-black"
+//           value={config.description}
+//           onChange={(e) => setConfig({ ...config, description: e.target.value })}
+//         />
+//         <input
+//           type="text"
+//           placeholder="ID кампании"
+//           className="w-full p-2 border rounded text-black"
+//           value={config.compainId}
+//           onChange={(e) => setConfig({ ...config, compainId: e.target.value })}
+//         />
+//         <input
+//           type="text"
+//           placeholder="ID пользователя"
+//           className="w-full p-2 border rounded text-black"
+//           value={config.userId}
+//           onChange={(e) => setConfig({ ...config, userId: e.target.value })}
+//         />
+//         <button
+//           onClick={handleCreateContainer}
+//           disabled={isLoading}
+//           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+//         >
+//           {isLoading ? 'Создание...' : 'Создать контейнер'}
+//         </button>
+//       </div>
+
+//       <div className="space-y-2">
+//         <h2 className="text-lg font-semibold">Таймер: {timer.elapsedSeconds} сек ({timer.isRunning ? 'идет' : 'пауза'})</h2>
+//         <button onClick={pauseTimer} className="bg-yellow-400 px-3 py-1 rounded text-black">Пауза</button>
+//         <button onClick={resumeTimer} className="bg-green-500 text-white px-3 py-1 rounded ml-2 text-black">Продолжить</button>
+//       </div>
+
+//       <div className="space-y-2">
+//         <input
+//           type="text"
+//           placeholder="Лог-сообщение"
+//           className="w-full p-2 border rounded text-black"
+//           value={logInput}
+//           onChange={(e) => setLogInput(e.target.value)}
+//         />
+//         <button
+//           onClick={handleSendLog}
+//           className="bg-gray-800 text-white px-4 py-2 rounded "
+//         >
+//           Отправить лог
+//         </button>
+//       </div>
+
+//       <div className="space-y-2">
+//         <input
+//           type="text"
+//           placeholder="Party ID для скачивания логов"
+//           className="w-full p-2 border rounded text-black"
+//           value={partyId}
+//           onChange={(e) => setPartyId(e.target.value)}
+//         />
+//         <button
+//           onClick={handleDownloadLogs}
+//           className="bg-purple-700 text-white px-4 py-2 rounded"
+//         >
+//           Скачать логи
+//         </button>
+//       </div>
+
+//       <div className="space-y-1">
+//         <h2 className="font-semibold">Логи:</h2>
+//         <ul className="max-h-64 overflow-auto border p-2 rounded">
+//           {logs.map((log, i) => (
+//             <li key={i} className="text-sm border-b py-1">
+//               {JSON.stringify(log)}
+//             </li>
+//           ))}
+//         </ul>
+//       </div>
+//     </main>
+//   );
+// }
