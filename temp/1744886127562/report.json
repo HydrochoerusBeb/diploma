@@ -1,0 +1,27 @@
+{
+  "session": {
+    "name": "dfsdf",
+    "scenario": "dsfsdf",
+    "characters": [
+      "sdf",
+      "asd",
+      "as",
+      "asd",
+      ""
+    ]
+  },
+  "summary": {
+    "xpGained": 0,
+    "lootCollected": [],
+    "totalEvents": 1,
+    "durationSeconds": 51
+  },
+  "logs": [
+    {
+      "type": "event",
+      "timestamp": "2025-04-17T10:36:16.995Z",
+      "message": "asdasd"
+    }
+  ],
+  "closedAt": "2025-04-17T10:36:19.720Z"
+}

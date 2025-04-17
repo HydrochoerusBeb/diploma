@@ -1,22 +1,37 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { createSession, getLogs, getTimer, controlTimer, endSession, SessionData, LogEntry, SessionSummary } from '@/actions/party';
+import { useState, useEffect } from "react";
+import {
+  createSession,
+  getLogs,
+  getTimer,
+  controlTimer,
+  endSession,
+  SessionData,
+  LogEntry,
+  SessionSummary,
+} from "@/actions/party";
+import { useParams } from "next/navigation";
+import { downloadReport } from "@/actions/downloadReport";
 
 export default function PartyPage() {
-  const [name, setName] = useState('');
-  const [scenario, setScenario] = useState('');
-  const [characters, setCharacters] = useState('');
-  const [logMessage, setLogMessage] = useState('');
-  const [logType, setLogType] = useState<'combat' | 'loot' | 'event'>('event');
+  const [name, setName] = useState("");
+  const [scenario, setScenario] = useState("");
+  const [characters, setCharacters] = useState("");
+  const [logMessage, setLogMessage] = useState("");
+  const [logType, setLogType] = useState<"combat" | "loot" | "event">("event");
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [logUrl, setLogUrl] = useState<string | null>(null);
   const [timerUrl, setTimerUrl] = useState<string | null>(null);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [summary, setSummary] = useState<SessionSummary | null>(null);
-  const [timer, setTimer] = useState<{ isRunning: boolean; elapsedSeconds: number }>({ isRunning: true, elapsedSeconds: 0 });
+  const [timer, setTimer] = useState<{
+    isRunning: boolean;
+    elapsedSeconds: number;
+  }>({ isRunning: true, elapsedSeconds: 0 });
 
-  // Загрузка логов и таймера в реальном времени
+  const params = useParams();
+
   useEffect(() => {
     if (!sessionId) return;
 
@@ -32,13 +47,14 @@ export default function PartyPage() {
 
   const handleCreate = async () => {
     if (!name || !scenario || !characters) {
-      alert('Заполните все поля');
+      alert("Заполните все поля");
       return;
     }
     const sessionData: SessionData = {
       name,
       scenario,
-      characters: characters.split(',').map(c => c.trim()),
+      characters: characters.split(",").map((c) => c.trim()),
+      partyID: params.id,
     };
     try {
       const { sessionId, logUrl, timerUrl } = await createSession(sessionData);
@@ -49,14 +65,14 @@ export default function PartyPage() {
       setSummary(null);
       setTimer({ isRunning: true, elapsedSeconds: 0 });
     } catch (err) {
-      console.error('Ошибка создания сессии:', err);
-      alert('Не удалось создать сессию');
+      console.error("Ошибка создания сессии:", err);
+      alert("Не удалось создать сессию");
     }
   };
 
   const handleSendLog = async () => {
     if (!logUrl || !logMessage) {
-      console.log('logUrl или logMessage отсутствуют:', { logUrl, logMessage });
+      console.log("logUrl или logMessage отсутствуют:", { logUrl, logMessage });
       return;
     }
     const logEntry: LogEntry = {
@@ -64,33 +80,70 @@ export default function PartyPage() {
       timestamp: new Date().toISOString(),
       message: logMessage,
     };
-    console.log('Отправка лога:', logEntry, 'на URL:', logUrl);
+    console.log("Отправка лога:", logEntry, "на URL:", logUrl);
     try {
       const response = await fetch(logUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(logEntry),
       });
       if (!response.ok) {
-        console.error('Ответ сервера не OK:', response.status, response.statusText);
-        throw new Error('Ошибка отправки лога');
+        console.error(
+          "Ответ сервера не OK:",
+          response.status,
+          response.statusText
+        );
+        throw new Error("Ошибка отправки лога");
       }
-      console.log('Лог успешно отправлен');
-      setLogMessage('');
+      console.log("Лог успешно отправлен");
+      setLogMessage("");
     } catch (err) {
-      console.error('Ошибка отправки лога:', err);
-      alert('Не удалось отправить лог');
+      console.error("Ошибка отправки лога:", err);
+      alert("Не удалось отправить лог");
     }
   };
 
-  const handleTimerControl = async (action: 'pause' | 'resume') => {
+  const handleDownload = async () => {
+    if (!sessionId) return;
+
+    try {
+      const fileBuffer = await downloadReport(sessionId);
+      if (!fileBuffer) {
+        alert("Файл отчёта не найден");
+        return;
+      }
+
+      const blob = new Blob([fileBuffer], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `session-${sessionId}-report.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Ошибка загрузки отчёта:", err);
+      alert("Не удалось скачать отчёт");
+    }
+  };
+
+  const handleTimerControl = async (action: "pause" | "resume") => {
     if (!sessionId || !timerUrl) return;
     try {
       await controlTimer(sessionId, action);
-      setTimer(prev => ({ ...prev, isRunning: action === 'resume' }));
+      setTimer((prev) => ({ ...prev, isRunning: action === "resume" }));
     } catch (err) {
-      console.error(`Ошибка ${action === 'pause' ? 'паузы' : 'возобновления'} таймера:`, err);
-      alert(`Не удалось ${action === 'pause' ? 'поставить на паузу' : 'возобновить'} таймер`);
+      console.error(
+        `Ошибка ${action === "pause" ? "паузы" : "возобновления"} таймера:`,
+        err
+      );
+      alert(
+        `Не удалось ${
+          action === "pause" ? "поставить на паузу" : "возобновить"
+        } таймер`
+      );
     }
   };
 
@@ -105,16 +158,20 @@ export default function PartyPage() {
       setLogs([]);
       setTimer({ isRunning: false, elapsedSeconds: 0 });
     } catch (err) {
-      console.error('Ошибка завершения сессии:', err);
-      alert('Не удалось завершить сессию');
+      console.error("Ошибка завершения сессии:", err);
+      alert("Не удалось завершить сессию");
     }
   };
 
   // Форматирование времени
   const formatDuration = (seconds: number): string => {
-    const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
-    const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
-    const s = (seconds % 60).toString().padStart(2, '0');
+    const h = Math.floor(seconds / 3600)
+      .toString()
+      .padStart(2, "0");
+    const m = Math.floor((seconds % 3600) / 60)
+      .toString()
+      .padStart(2, "0");
+    const s = (seconds % 60).toString().padStart(2, "0");
     return `${h}:${m}:${s}`;
   };
 
@@ -153,7 +210,9 @@ export default function PartyPage() {
       <div className="pt-4">
         <select
           value={logType}
-          onChange={(e) => setLogType(e.target.value as 'combat' | 'loot' | 'event')}
+          onChange={(e) =>
+            setLogType(e.target.value as "combat" | "loot" | "event")
+          }
           className="border p-2 mr-2"
           disabled={!sessionId}
         >
@@ -178,16 +237,18 @@ export default function PartyPage() {
       </div>
 
       <div className="pt-4">
-        <h2 className="font-semibold">Таймер партии: {formatDuration(timer.elapsedSeconds)}</h2>
+        <h2 className="font-semibold">
+          Таймер партии: {formatDuration(timer.elapsedSeconds)}
+        </h2>
         <button
-          onClick={() => handleTimerControl('pause')}
+          onClick={() => handleTimerControl("pause")}
           className="bg-yellow-500 text-white px-4 py-2 rounded disabled:bg-gray-400 mr-2"
           disabled={!sessionId || !timer.isRunning}
         >
           Пауза
         </button>
         <button
-          onClick={() => handleTimerControl('resume')}
+          onClick={() => handleTimerControl("resume")}
           className="bg-yellow-500 text-white px-4 py-2 rounded disabled:bg-gray-400"
           disabled={!sessionId || timer.isRunning}
         >
@@ -208,21 +269,23 @@ export default function PartyPage() {
             <h2 className="font-semibold">Итог сессии:</h2>
             <p>Длительность: {formatDuration(summary.durationSeconds)}</p>
             <p>Набрано опыта: {summary.xpGained}</p>
-            <p>Собранный лут: {summary.lootCollected.join(', ') || 'нет'}</p>
+            <p>Собранный лут: {summary.lootCollected.join(", ") || "нет"}</p>
             <p>Всего событий: {summary.totalEvents}</p>
+
           </div>
         )}
       </div>
-
+    
       <div className="pt-4">
         <h2 className="font-semibold">Логи</h2>
         <ul className="list-disc list-inside">
           {logs.length > 0 ? (
             logs.map((log, idx) => (
               <li key={idx}>
-                [{log.timestamp}] {log.type === 'combat' && `Бой: ${log.message}`}
-                {log.type === 'loot' && `Лут: ${log.message}`}
-                {log.type === 'event' && `Событие: ${log.message}`}
+                [{log.timestamp}]{" "}
+                {log.type === "combat" && `Бой: ${log.message}`}
+                {log.type === "loot" && `Лут: ${log.message}`}
+                {log.type === "event" && `Событие: ${log.message}`}
               </li>
             ))
           ) : (

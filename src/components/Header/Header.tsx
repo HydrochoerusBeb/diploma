@@ -2,10 +2,8 @@
 
 import { getSession, logout } from "@/actions/auth";
 import { SessionPayload } from "@/utils/types/SessionPayload";
-// import { deleteSession } from "@/lib/session";
 import { Button, Link } from "@heroui/react";
 import { useEffect, useState } from "react";
-// import { Router } from "next/router";
 
 const Header = () => {
   

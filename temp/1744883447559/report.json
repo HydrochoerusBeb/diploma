@@ -1,0 +1,40 @@
+{
+  "session": {
+    "name": "ф",
+    "scenario": "ф",
+    "characters": [
+      "ф"
+    ]
+  },
+  "summary": {
+    "xpGained": 50,
+    "lootCollected": [
+      "фывфывфв"
+    ],
+    "totalEvents": 4,
+    "durationSeconds": 185
+  },
+  "logs": [
+    {
+      "type": "event",
+      "timestamp": "2025-04-17T09:53:41.165Z",
+      "message": "фывфывфывфыв"
+    },
+    {
+      "type": "event",
+      "timestamp": "2025-04-17T09:53:43.468Z",
+      "message": "ффффф"
+    },
+    {
+      "type": "loot",
+      "timestamp": "2025-04-17T09:53:46.676Z",
+      "message": "фывфывфв"
+    },
+    {
+      "type": "combat",
+      "timestamp": "2025-04-17T09:53:49.790Z",
+      "message": "ффф"
+    }
+  ],
+  "closedAt": "2025-04-17T09:53:54.014Z"
+}

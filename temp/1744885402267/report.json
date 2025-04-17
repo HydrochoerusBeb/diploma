@@ -1,0 +1,23 @@
+{
+  "session": {
+    "name": "a",
+    "scenario": "a",
+    "characters": [
+      "a"
+    ]
+  },
+  "summary": {
+    "xpGained": 0,
+    "lootCollected": [],
+    "totalEvents": 1,
+    "durationSeconds": 3
+  },
+  "logs": [
+    {
+      "type": "event",
+      "timestamp": "2025-04-17T10:23:24.521Z",
+      "message": "sadasd"
+    }
+  ],
+  "closedAt": "2025-04-17T10:23:26.411Z"
+}

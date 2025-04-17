@@ -1,0 +1,26 @@
+{
+  "session": {
+    "name": "a",
+    "scenario": "a",
+    "characters": [
+      "a",
+      "a",
+      "a",
+      "a"
+    ]
+  },
+  "summary": {
+    "xpGained": 0,
+    "lootCollected": [],
+    "totalEvents": 1,
+    "durationSeconds": 5
+  },
+  "logs": [
+    {
+      "type": "event",
+      "timestamp": "2025-04-17T10:25:46.187Z",
+      "message": "a"
+    }
+  ],
+  "closedAt": "2025-04-17T10:25:49.199Z"
+}

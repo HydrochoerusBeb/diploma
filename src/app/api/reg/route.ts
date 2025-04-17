@@ -8,18 +8,12 @@ export async function POST(req: Request) {
     console.log(email, password);
     
     if (!email || !password) {
-      return NextResponse.json(
-        { error: "Заполните все поля" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Заполните все поля" }, { status: 400 });
     }
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
-      return NextResponse.json(
-        { error: "Такой пользователь уже есть" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Такой пользователь уже есть" }, { status: 400 });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -27,8 +21,8 @@ export async function POST(req: Request) {
     await prisma.user.create({
       data: { email, password: hashedPassword },
     });
-    
-    return NextResponse.redirect(new URL("/login", req.url), 302);
+
+    return NextResponse.json({ status: true });
   } catch (error) {
     console.error("Ошибка регистрации:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });

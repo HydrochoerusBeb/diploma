@@ -5,13 +5,12 @@ import { promisify } from 'util';
 import net from 'net';
 import fs from 'fs/promises';
 import path from 'path';
-// import { AddressInfo } from 'net';
 
-// Типы данных
 export interface SessionData {
   name: string;
   scenario: string;
   characters: string[];
+  partyID: string | string[] | undefined;
 }
 
 export interface LogEntry {
@@ -30,10 +29,8 @@ export interface SessionSummary {
 const execAsync = promisify(exec);
 const tempDir = path.join(process.cwd(), 'temp');
 
-// Создаем папку temp
 await fs.mkdir(tempDir, { recursive: true, mode: 0o777 });
 
-// Функция для поиска свободного порта
 async function getFreePort(): Promise<number> {
   return new Promise((resolve, reject) => {
     const server = net.createServer();
@@ -50,121 +47,80 @@ async function getFreePort(): Promise<number> {
   });
 }
 
-// Санитизация имени контейнера
 function sanitizeContainerName(name: string): string {
   return name.replace(/[^a-zA-Z0-9_-]/g, '').toLowerCase();
 }
 
-// Создание сессии
-export async function createSession({ name, scenario, characters }: SessionData): Promise<{ sessionId: string; logUrl: string; timerUrl: string }> {
+export async function createSession({ name, scenario, characters, partyID }: SessionData): Promise<{
+  sessionId: string;
+  logUrl: string;
+  timerUrl: string;
+}> {
   const sessionId = Date.now().toString();
   const containerName = `dnd-${sanitizeContainerName(sessionId)}`;
   const port = await getFreePort();
-  const tempSessionPath = path.join(tempDir, `${sessionId}-session.json`);
+
+  const sessionPath = path.join(tempDir, sessionId);
+  await fs.mkdir(sessionPath, { recursive: true });
+
+  const sessionJsonPath = path.join(sessionPath, 'session.json');
+  const sessionData = { name, scenario, characters, partyID };
+  await fs.writeFile(sessionJsonPath, JSON.stringify(sessionData, null, 2));
+
+  const volumePath = sessionPath.replace(/\\/g, '/').replace(/^([A-Za-z]):/, (_, d) => `/${d.toLowerCase()}`);
 
   try {
-    // Записываем SessionData во временный файл
-    const sessionData = { name, scenario, characters };
-    await fs.writeFile(tempSessionPath, JSON.stringify(sessionData, null, 2), { mode: 0o666 });
-
-    // Запускаем контейнер
-    await execAsync(
-      `docker run -d --rm --name ${containerName} -p ${port}:3002 session-tracker`
-    );
+    const cmd = `docker run -d --rm --name ${containerName} -p ${port}:3002 -v "${volumePath}:/app/logs" session-tracker`;
+    await execAsync(cmd);
     console.log(`Контейнер ${containerName} запущен на порту ${port}`);
-
-    // Задержка для инициализации контейнера
-    await new Promise(resolve => setTimeout(resolve, 3000));
-
-    // Копируем session.json в контейнер
-    await execAsync(
-      `docker cp ${tempSessionPath} ${containerName}:/app/logs/session.json`
-    );
-    console.log(`Скопирован session.json в ${containerName}:/app/logs/session.json`);
-
-    // Отладка: проверяем файлы
-    try {
-      const { stdout } = await execAsync(
-        `docker exec ${containerName} find /app`
-      );
-      console.log(`Содержимое /app: ${stdout}`);
-    } catch (err) {
-      console.error('Ошибка проверки /app:', err);
-    }
-
   } catch (err) {
-    console.error('Ошибка создания сессии:', err);
+    console.error('Ошибка запуска контейнера:', err);
     throw new Error(`Не удалось создать сессию: ${err.message}`);
-  } finally {
-    // Удаляем временный файл
-    await fs.unlink(tempSessionPath).catch(() => {});
   }
 
   const logUrl = `http://localhost:${port}/log`;
   const timerUrl = `http://localhost:${port}/timer`;
-  console.log('Создан logUrl:', logUrl, 'timerUrl:', timerUrl);
   return { sessionId, logUrl, timerUrl };
 }
 
-// Получение логов
 export async function getLogs(sessionId: string): Promise<LogEntry[]> {
-  const containerName = `dnd-${sanitizeContainerName(sessionId)}`;
-  const logPath = '/app/logs/logs.txt';
-  const tempLogPath = path.join(tempDir, `${sessionId}-logs.txt`);
+  const sessionPath = path.join(tempDir, sessionId);
+  const logsPath = path.join(sessionPath, 'logs.txt');
 
   try {
-    // Копируем файл из контейнера
-    await execAsync(`docker cp ${containerName}:${logPath} ${tempLogPath}`);
-    console.log(`Логи скопированы в ${tempLogPath}`);
+    const content = await fs.readFile(logsPath, 'utf-8');
+    if (!content.trim()) return [];
 
-    // Читаем файл
-    const content = await fs.readFile(tempLogPath, 'utf-8');
-    if (!content.trim()) {
-      console.log('Файл логов пуст');
-      return [];
-    }
-
-    // Парсим строки
     return content
       .split('\n')
       .filter(Boolean)
       .map((line, index) => {
         try {
           return JSON.parse(line) as LogEntry;
-        } catch {
-          console.error(`Ошибка парсинга строки ${index}: ${line}`);
+        } catch (err) {
+          console.warn(`Ошибка парсинга строки [${index}]:`, line);
           return null;
         }
       })
       .filter((log): log is LogEntry => log !== null);
   } catch (err) {
-    console.error('Ошибка получения логов:', err);
+    console.error('Ошибка чтения логов:', err);
     return [];
-  } finally {
-    // Удаляем временный файл
-    await fs.unlink(tempLogPath).catch(() => {});
   }
 }
 
-// Получение состояния таймера
 export async function getTimer(sessionId: string): Promise<{ isRunning: boolean; elapsedSeconds: number }> {
-  const containerName = `dnd-${sanitizeContainerName(sessionId)}`;
-  const timerPath = '/app/logs/timer.json';
-  const tempTimerPath = path.join(tempDir, `${sessionId}-timer.json`);
+  const timerPath = path.join(tempDir, sessionId, 'timer.json');
 
   try {
-    await execAsync(`docker cp ${containerName}:${timerPath} ${tempTimerPath}`);
-    const content = await fs.readFile(tempTimerPath, 'utf-8');
+    const content = await fs.readFile(timerPath, 'utf-8');
     return JSON.parse(content);
   } catch (err) {
-    console.error('Ошибка получения таймера:', err);
+    console.error('Ошибка чтения timer.json:', err);
     return { isRunning: true, elapsedSeconds: 0 };
-  } finally {
-    await fs.unlink(tempTimerPath).catch(() => {});
   }
 }
 
-// Управление таймером
 export async function controlTimer(sessionId: string, action: 'pause' | 'resume'): Promise<void> {
   const containerName = `dnd-${sanitizeContainerName(sessionId)}`;
   try {
@@ -177,70 +133,84 @@ export async function controlTimer(sessionId: string, action: 'pause' | 'resume'
   }
 }
 
-// Завершение сессии
-export async function endSession(sessionId: string): Promise<SessionSummary> {
-  const containerName = `dnd-${sanitizeContainerName(sessionId)}`;
-  const logPath = '/app/logs/logs.txt';
-  const timerPath = '/app/logs/timer.json';
-  const tempLogPath = path.join(tempDir, `${sessionId}-logs.txt`);
-  const tempTimerPath = path.join(tempDir, `${sessionId}-timer.json`);
-  let logLines: LogEntry[] = [];
+export async function endSession(sessionId: string): Promise<{ summary: SessionSummary; reportBase64: string }> {
+  const sessionDir = path.join(tempDir, sessionId);
+  const logsPath = path.join(sessionDir, 'logs.txt');
+  const timerPath = path.join(sessionDir, 'timer.json');
+  const sessionPath = path.join(sessionDir, 'session.json');
+  const reportPath = path.join(sessionDir, 'report.json');
+
+  let logs: LogEntry[] = [];
   let durationSeconds = 0;
+  let sessionMeta: any = {};
 
   try {
-    await execAsync(`docker cp ${containerName}:${logPath} ${tempLogPath}`);
-    const logContent = await fs.readFile(tempLogPath, 'utf-8');
-    if (logContent.trim()) {
-      logLines = logContent
-        .split('\n')
-        .filter(Boolean)
-        .map((line, index) => {
-          try {
-            return JSON.parse(line) as LogEntry;
-          } catch {
-            console.error(`Ошибка парсинга строки ${index}: ${line}`);
-            return null;
-          }
-        })
-        .filter((log): log is LogEntry => log !== null);
-    }
+    const content = await fs.readFile(logsPath, 'utf-8');
+    logs = content
+      .split('\n')
+      .filter(Boolean)
+      .map((line, i) => {
+        try {
+          return JSON.parse(line) as LogEntry;
+        } catch {
+          return null;
+        }
+      })
+      .filter((entry): entry is LogEntry => entry !== null);
   } catch (err) {
-    console.error('Ошибка чтения логов:', err);
-  } finally {
-    await fs.unlink(tempLogPath).catch(() => {});
+    console.error('Ошибка чтения logs.txt:', err);
   }
 
   try {
-    await execAsync(`docker cp ${containerName}:${timerPath} ${tempTimerPath}`);
-    const timerContent = await fs.readFile(tempTimerPath, 'utf-8');
-    const timer = JSON.parse(timerContent);
-    durationSeconds = timer.elapsedSeconds;
+    const content = await fs.readFile(timerPath, 'utf-8');
+    const timer = JSON.parse(content);
+    durationSeconds = timer.elapsedSeconds || 0;
   } catch (err) {
-    console.error('Ошибка чтения таймера:', err);
-  } finally {
-    await fs.unlink(tempTimerPath).catch(() => {});
+    console.error('Ошибка чтения timer.json:', err);
   }
 
-  const summary = parseLogs(logLines, durationSeconds);
+  try {
+    const content = await fs.readFile(sessionPath, 'utf-8');
+    sessionMeta = JSON.parse(content);
+  } catch (err) {
+    console.error('Ошибка чтения session.json:', err);
+  }
+
+  const summary = parseLogs(logs, durationSeconds);
+
+  const report = {
+    session: sessionMeta,
+    summary,
+    logs,
+    closedAt: new Date().toISOString(),
+  };
 
   try {
+    await fs.writeFile(reportPath, JSON.stringify(report, null, 2));
+    console.log('Сформирован report.json');
+  } catch (err) {
+    console.error('Ошибка записи report.json:', err);
+  }
+
+  try {
+    const containerName = `dnd-${sessionId}`;
     await execAsync(`docker stop ${containerName}`);
-    console.log(`Контейнер ${containerName} остановлен`);
-  } catch (err) {
-    console.error('Ошибка остановки контейнера:', err);
-  }
+  } catch {}
 
-  return summary;
+  const reportBase64 = Buffer.from(JSON.stringify(report, null, 2)).toString('base64');
+
+  return { summary, reportBase64 };
 }
 
-// Парсинг логов
 function parseLogs(logs: LogEntry[], durationSeconds: number): SessionSummary {
   let xpGained = 0;
   const lootCollected: string[] = [];
+
   logs.forEach(log => {
     if (log.type === 'combat') xpGained += 50;
     if (log.type === 'loot' && log.message) lootCollected.push(log.message);
   });
+
   return {
     xpGained,
     lootCollected,

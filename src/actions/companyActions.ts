@@ -73,3 +73,138 @@ export async function getParty({
   });
   return party;
 }
+
+export async function createMainCharacter({
+  name,
+  className,
+  race,
+  description,
+  avatar,
+  level,
+  alive = true,
+  userId,
+  compainId,
+}: {
+  name: string;
+  className: string;
+  race: string;
+  description: string;
+  avatar?:  Uint8Array | null;
+  level: number;
+  alive?: boolean;
+  userId: string;
+  compainId: string;
+}) {
+  return await prisma.mainCharacter.create({
+    data: {
+      name,
+      class: className,
+      race,
+      description,
+      level,
+      avatar,
+      alive,
+      userId,
+      compainId,
+    },
+  });
+}
+
+
+export async function createNpcCharacter({
+  name,
+  className,
+  race,
+  description,
+  avatar,
+  level,
+  location,
+  occupation,
+  alive = true,
+  userId,
+  compainId,
+}: {
+  name: string;
+  className?: string;
+  race?: string;
+  description: string;
+  avatar?:  Uint8Array | null;
+  level: number;
+  location: string;
+  occupation?: string;
+  alive?: boolean;
+  userId: string;
+  compainId: string;
+}) {
+  return await prisma.character.create({
+    data: {
+      name,
+      class: className,
+      race: race ?? "Unknown",
+      description,
+      avatar,
+      level,
+      alive,
+      location,
+      occupation: occupation ?? "Unknown",
+      userId,
+      compainId,
+    },
+  });
+}
+
+
+// Получить всех основных персонажей кампании
+export async function getMainCharactersByCompany(compainId: string, userId: string) {
+  return await prisma.mainCharacter.findMany({
+    where: {
+      compainId,
+      userId,
+    },
+    select: {
+      id: true,
+      name: true,
+      race: true,
+      class: true,
+      level: true,
+    },
+  });
+}
+
+// Получить всех NPC персонажей кампании
+export async function getNpcCharactersByCompany(compainId: string, userId: string) {
+  return await prisma.character.findMany({
+    where: {
+      compainId,
+      userId,
+    },
+    select: {
+      id: true,
+      name: true,
+      race: true,
+      occupation: true,
+      location: true,
+      level: true,
+    },
+  });
+}
+
+
+
+export async function getCharactersByCompany(companyId: string) {
+  const [mainCharacters, npcs] = await Promise.all([
+    prisma.mainCharacter.findMany({
+      where: { compainId: companyId },
+      select: { id: true, name: true },
+    }),
+    prisma.character.findMany({
+      where: { compainId: companyId },
+      select: { id: true, name: true, location: true },
+    }),
+  ]);
+
+  return [
+    mainCharacters,
+    npcs,
+  ];
+}
