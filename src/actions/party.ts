@@ -9,7 +9,7 @@ import path from 'path';
 export interface SessionData {
   name: string;
   scenario: string;
-  characters: string[];
+  characters: Array<{ id: string; name: string }>
   partyID: string | string[] | undefined;
 }
 

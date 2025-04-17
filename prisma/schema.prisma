@@ -44,7 +44,7 @@ model Party {
   description    String
   compainId      String
   compain        Compain              @relation(fields: [compainId], references: [id])
-  log            String?
+  log            Json?
   characters     PartyCharacter[]
   mainCharacters PartyMainCharacter[]
   createdAt      DateTime             @default(now())

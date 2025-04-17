@@ -1,0 +1,30 @@
+{
+  "session": {
+    "name": "a",
+    "scenario": "a",
+    "characters": [
+      {
+        "id": "2206e4ba-a8f0-4fcc-b161-8d122f57ff1e",
+        "name": "фывфывqwe"
+      },
+      {
+        "id": "41cc2d86-a5b2-490a-9ef7-37825e3d946c",
+        "name": "фывфыв"
+      }
+    ]
+  },
+  "summary": {
+    "xpGained": 0,
+    "lootCollected": [],
+    "totalEvents": 1,
+    "durationSeconds": 4
+  },
+  "logs": [
+    {
+      "type": "event",
+      "timestamp": "2025-04-17T14:38:02.285Z",
+      "message": "asdasdsad"
+    }
+  ],
+  "closedAt": "2025-04-17T14:38:04.304Z"
+}

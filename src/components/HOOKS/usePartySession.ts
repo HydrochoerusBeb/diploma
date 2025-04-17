@@ -77,7 +77,7 @@ export function usePartySession() {
     const data: SessionData = {
       name,
       scenario,
-      characters: selectedCharacters.map((c) => c.name),
+      characters: selectedCharacters.map((c) => ({ id: c.id, name: c.name })),
     };
     const { sessionId, logUrl, timerUrl } = await createSession(data);
     setSessionId(sessionId);
