@@ -1,5 +1,3 @@
-// import { Button, Form, Input, Link } from "@heroui/react";
-// import { handleSubmit } from "../api/login/route";
 "use client";
 
 import { getSession } from "@/actions/auth";
@@ -10,7 +8,6 @@ import { SessionPayload } from "@/utils/types/SessionPayload";
 import { Spinner } from "@heroui/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-// import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 export default function Companies() {
   const [showForm, setShowForm] = useState(false);

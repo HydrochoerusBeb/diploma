@@ -26,7 +26,7 @@ export default function PartyPage() {
   // const [logMessage, setLogMessage] = useState("");
   // const [logType, setLogType] = useState<"combat" | "loot" | "event">("event");
 
-  const [loot, setLoot] = useState<Array<{ name: string; desc: string }>>([]);
+  const [loot, setLoot] = useState<Record<string, string>>({});
   const [newLoot, setNewLoot] = useState({ name: "", desc: "" });
 
   const [locations, setLocations] = useState<Record<string, string>>({});
@@ -34,7 +34,7 @@ export default function PartyPage() {
 
   const addLootItem = () => {
     if (!newLoot.name && !newLoot.desc) return;
-    setLoot((prev) => [...prev, { ...newLoot }]);
+    setLoot((prev) => ({ ...prev, [newLoot.name || `Loot ${newLoot.name}`]: newLoot.desc }));
     setNewLoot({ name: "", desc: "" });
   };
 
@@ -103,7 +103,7 @@ export default function PartyPage() {
       return;
     }
     await create(partyData.name, scenario, {
-      loot: loot.map((item) => `${item.name}: ${item.desc}`),
+      loot,
       locations,
     });
   };
@@ -174,9 +174,9 @@ export default function PartyPage() {
           <Button onPress={addLootItem}>Добавить</Button>
         </div>
         <ul className="list-disc pl-5 text-sm text-gray-700">
-          {loot.map((item, i) => (
-            <li key={i}>
-              <strong>{item.name}</strong>: {item.desc}
+          {Object.entries(loot).map(([key, value]) => (
+            <li key={key}>
+              <strong>{key}</strong>: {value}
             </li>
           ))}
         </ul>

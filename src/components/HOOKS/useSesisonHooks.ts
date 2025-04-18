@@ -35,7 +35,7 @@ export function useSessionEditor(sessionId: string | null) {
     setSessionData(updated);
   };
 
-  const updateLoot = (loot: string[]) => {
+  const updateLoot = (loot: Record<string, string>) => {
     if (!sessionData) return;
     setSessionData({ ...sessionData, loot });
   };

@@ -5,25 +5,23 @@ import { Button, Form, Input } from "@heroui/react";
 import { redirect } from "next/navigation";
 import { useState } from "react";
 
-// import { getData } from "@/utils/api/api";
-// import { useEffect, useState } from "react";
 
 export default function RegisterPage() {    
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    
-    const register = async () => {
+    const register = async (e: React.FormEvent) => {
+      e.preventDefault();
       try {
         const res = await postRegister({ email, password });
-
-        if (res.status) {
-          redirect('/login')
+        console.log(res.data); // для отладки
+        if (res.status === 200 || res.status === 201) {
+          redirect("/login");
         }
       } catch (error) {
         console.error("Ошибка регистрации:", error);
       }
-        
-    }
+    };
+    
 
 
   return (

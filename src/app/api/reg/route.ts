@@ -28,20 +28,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
   }
 }
-
-
-// 'use server'
-
-// import prisma from "@/lib/prisma";
-// import bcrypt from "bcrypt";
-// import { NextResponse } from "next/server";
-
-
-
-// export async function register(formData:FormData) {
-//   const email = formData.get("email") as string | undefined;
-//   const password = formData.get("password") as string | Buffer<ArrayBufferLike>;
-
-//   const existingUser = await prisma.user.findUnique({ where: { email } });
-
-// }

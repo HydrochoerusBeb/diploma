@@ -20,7 +20,6 @@ import { useParams } from "next/navigation";
 import { getSession } from "@/actions/auth";
 import { Character } from "@/utils/types/CharacterType";
 import { SessionPayload } from "@/utils/types/SessionPayload";
-import { log } from "console";
 
 export function usePartySession() {
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -90,7 +89,7 @@ export function usePartySession() {
       ]);
 
       setSessionId(savedId);
-      setLogUrl(`http://localhost:????/log`); // или получай URL в LS, если хочешь
+      setLogUrl(`http://localhost:????/log`);
       setTimerUrl(`http://localhost:????/timer`);
       setLogs(fetchedLogs);
       setTimer(timerData);
@@ -101,7 +100,7 @@ export function usePartySession() {
   const create = async (
     name: string,
     scenario: string,
-    extras?: { loot?: string[]; locations?: Record<string, string> }
+    extras?: { loot?: Record<string, string>; locations?: Record<string, string> }
   ) => {
     const mainCharactersIds = selectedCharacters
       .filter((c) => c.type === "main")
@@ -111,7 +110,6 @@ export function usePartySession() {
       .filter((c) => c.type === "npc")
       .map((c) => c.id);
   
-    // 👉 Запрашиваем полные данные из БД
     const [mainChars, npcChars] = await Promise.all([
       Promise.all(mainCharactersIds.map(id => getMainCharacterById(id))),
       Promise.all(npcIds.map(id => getCharacterById(id))),

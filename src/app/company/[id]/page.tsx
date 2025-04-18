@@ -56,7 +56,7 @@ export default function CompanyPage() {
     async function fetchCompany() {
       const data = await getCompany({
         id: Number(params.id),
-        userId: user.id,
+        userId: user!.id,
       });
       setCompany(data);
       if (data?.self) {
@@ -70,7 +70,7 @@ export default function CompanyPage() {
   useEffect(() => {
     if (!user || !company) return;
     async function fetchParties() {
-      const data = await getParties(user.id, company.id);
+      const data = await getParties(user!.id, company!.id);
       setParty(data);
     }
     fetchParties();

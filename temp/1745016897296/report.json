@@ -1,0 +1,46 @@
+{
+  "session": {
+    "name": "Новая партия егора",
+    "scenario": "Ну ээээээээээээ",
+    "mainCharacters": [
+      {
+        "id": "656e64ca-40f1-437d-88a4-f27d4eccd408",
+        "name": "Арсен",
+        "class": "воин",
+        "race": "негр",
+        "description": "долбаеб никто его не любит вообще",
+        "alive": true,
+        "level": 1
+      }
+    ],
+    "npcs": [
+      {
+        "id": "2206e4ba-a8f0-4fcc-b161-8d122f57ff1e",
+        "name": "фывфывqwe",
+        "class": "фыв",
+        "race": "фыв",
+        "description": "фыв",
+        "alive": true,
+        "level": 1,
+        "location": "asdasdasd",
+        "occupation": "asdasdasd"
+      }
+    ],
+    "partyID": "930442",
+    "locations": {
+      "гавно": "гавно"
+    },
+    "loot": [
+      "гавно: гавно"
+    ],
+    "details": ""
+  },
+  "summary": {
+    "xpGained": 0,
+    "lootCollected": [],
+    "totalEvents": 0,
+    "durationSeconds": 381
+  },
+  "logs": [],
+  "closedAt": "2025-04-18T23:01:29.185Z"
+}

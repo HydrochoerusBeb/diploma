@@ -33,7 +33,7 @@ export default function CharacterModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 z-50 flex justify-center items-center">
-      <div className="bg-white p-6 rounded-lg w-[500px] space-y-4">
+      <div className="bg-slate-600 p-6 rounded-lg w-[500px] space-y-4">
         <h2 className="text-xl font-bold">{name}</h2>
         <p>
           <strong>Класс:</strong> {className}
@@ -69,7 +69,7 @@ export default function CharacterModal({
           <label className="font-semibold">Жив</label>
           <input
             type="checkbox"
-            checked={Boolean(character.alive)} // ← строго true/false
+            checked={Boolean(character.alive)} 
             onChange={(e) =>
               onChange({ ...character, alive: e.target.checked })
             }

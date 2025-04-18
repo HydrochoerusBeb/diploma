@@ -14,11 +14,14 @@ export async function PostPidor(params: PidorRequest) {
 }
 
 export async function postRegister(params: RegisterRequest) {
+  console.log("Данные для регистрации:", params);
+
   const res = await api.post("/reg", params, {
     headers: {
       "Content-Type": "application/json",
     },
   });
-  console.log(res.data);
+
+  console.log("Ответ сервера:", res.data);
   return res;
 }

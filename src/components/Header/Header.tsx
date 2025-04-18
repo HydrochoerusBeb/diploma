@@ -12,7 +12,7 @@ const Header = () => {
   useEffect(() => {
     async function fetchSession() {
       const mySession = await getSession();
-      setSession(mySession || null);
+      setSession(mySession as SessionPayload || null);
     }
     fetchSession();
   }, [])

@@ -10,11 +10,11 @@ import prisma from '@/lib/prisma';
 export interface SessionData {
   name: string;
   scenario: string;
-  mainCharacters: Array<any>; // full character data
-  npcs: Array<any>; // full character data
+  mainCharacters: Array<any>; 
+  npcs: Array<any>;
   partyID: string | string[] | undefined;
   locations?: Record<string, string>;
-  loot?: Record<string, string>;
+  loot?: Record<string, string> | undefined;
   details?: string;
 }
 
