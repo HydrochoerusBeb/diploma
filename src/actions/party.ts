@@ -5,12 +5,17 @@ import { promisify } from 'util';
 import net from 'net';
 import fs from 'fs/promises';
 import path from 'path';
+import prisma from '@/lib/prisma';
 
 export interface SessionData {
   name: string;
   scenario: string;
-  characters: Array<{ id: string; name: string }>
+  mainCharacters: Array<any>; // full character data
+  npcs: Array<any>; // full character data
   partyID: string | string[] | undefined;
+  locations?: Record<string, string>;
+  loot?: Record<string, string>;
+  details?: string;
 }
 
 export interface LogEntry {
@@ -51,7 +56,16 @@ function sanitizeContainerName(name: string): string {
   return name.replace(/[^a-zA-Z0-9_-]/g, '').toLowerCase();
 }
 
-export async function createSession({ name, scenario, characters, partyID }: SessionData): Promise<{
+export async function createSession({
+  name,
+  scenario,
+  mainCharacters,
+  partyID,
+  locations = {},
+  loot = {},
+  npcs = [],
+  details = "",
+}: SessionData): Promise<{
   sessionId: string;
   logUrl: string;
   timerUrl: string;
@@ -63,9 +77,40 @@ export async function createSession({ name, scenario, characters, partyID }: Ses
   const sessionPath = path.join(tempDir, sessionId);
   await fs.mkdir(sessionPath, { recursive: true });
 
-  const sessionJsonPath = path.join(sessionPath, 'session.json');
-  const sessionData = { name, scenario, characters, partyID };
-  await fs.writeFile(sessionJsonPath, JSON.stringify(sessionData, null, 2));
+  console.log('[CreateSession] Создание сессии:', {
+    name,
+    scenario,
+    partyID,
+    mainCharacters,
+    npcs,
+    locations,
+    loot,
+    details,
+  });
+
+  const extendedMainCharacters = mainCharacters.map((c: any) => ({
+    ...c,
+    description: c.description || '',
+    alive: c.alive !== undefined ? c.alive : true,
+  }));
+
+  const extendedNpcs = npcs.map((c: any) => ({
+    ...c,
+    description: c.description || '',
+    alive: c.alive !== undefined ? c.alive : true,
+  }));
+
+  const sessionJsonPath = path.join(sessionPath, "session.json");
+  await fs.writeFile(sessionJsonPath, JSON.stringify({
+    name,
+    scenario,
+    mainCharacters: extendedMainCharacters,
+    npcs: extendedNpcs,
+    partyID,
+    locations,
+    loot,
+    details,
+  }, null, 2));
 
   const volumePath = sessionPath.replace(/\\/g, '/').replace(/^([A-Za-z]):/, (_, d) => `/${d.toLowerCase()}`);
 
@@ -73,7 +118,7 @@ export async function createSession({ name, scenario, characters, partyID }: Ses
     const cmd = `docker run -d --rm --name ${containerName} -p ${port}:3002 -v "${volumePath}:/app/logs" session-tracker`;
     await execAsync(cmd);
     console.log(`Контейнер ${containerName} запущен на порту ${port}`);
-  } catch (err) {
+  } catch (err: any) {
     console.error('Ошибка запуска контейнера:', err);
     throw new Error(`Не удалось создать сессию: ${err.message}`);
   }
@@ -82,6 +127,7 @@ export async function createSession({ name, scenario, characters, partyID }: Ses
   const timerUrl = `http://localhost:${port}/timer`;
   return { sessionId, logUrl, timerUrl };
 }
+
 
 export async function getLogs(sessionId: string): Promise<LogEntry[]> {
   const sessionPath = path.join(tempDir, sessionId);
@@ -218,3 +264,48 @@ function parseLogs(logs: LogEntry[], durationSeconds: number): SessionSummary {
     durationSeconds,
   };
 }
+
+
+export async function updateSessionData(
+  sessionId: string,
+  patch: Partial<SessionData>
+): Promise<void> {
+  const sessionPath = path.join(tempDir, sessionId, "session.json");
+
+  try {
+    const content = await fs.readFile(sessionPath, "utf-8");
+    const currentData = JSON.parse(content) as SessionData;
+
+    const updated = {
+      ...currentData,
+      ...patch,
+      locations: {
+        ...(currentData.locations || {}),
+        ...(patch.locations || {}),
+      },
+      loot: patch.loot ?? currentData.loot ?? [],
+      npcs: patch.npcs ?? currentData.npcs ?? [],
+      details: patch.details ?? currentData.details ?? "",
+    };
+
+    await fs.writeFile(sessionPath, JSON.stringify(updated, null, 2));
+    console.log(`[Session Update] session.json обновлён (${sessionId})`);
+  } catch (err) {
+    console.error(`[Session Update] Ошибка при обновлении session.json`, err);
+    throw new Error("Не удалось обновить session.json");
+  }
+}
+
+
+export async function readSessionData(sessionId: string): Promise<SessionData | null> {
+  const sessionPath = path.join(tempDir, sessionId, "session.json");
+
+  try {
+    const content = await fs.readFile(sessionPath, "utf-8");
+    return JSON.parse(content) as SessionData;
+  } catch (err) {
+    console.error("Ошибка чтения session.json:", err);
+    return null;
+  }
+}
+

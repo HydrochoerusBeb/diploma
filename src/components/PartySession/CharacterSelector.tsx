@@ -1,6 +1,6 @@
 "use client";
 
-import { Character } from "@/utils/types/Character";
+import { Character } from "@/utils/types/CharacterType";
 import { Button } from "@heroui/react";
 
 type Props = {

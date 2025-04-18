@@ -1,0 +1,42 @@
+{
+  "session": {
+    "name": "Новая партия егора",
+    "scenario": "asdasd",
+    "mainCharacters": [
+      {
+        "id": "41cc2d86-a5b2-490a-9ef7-37825e3d946c",
+        "name": "фывфыв",
+        "level": 1,
+        "race": "фыв",
+        "class": "фыв"
+      },
+      {
+        "id": "656e64ca-40f1-437d-88a4-f27d4eccd408",
+        "name": "Арсен",
+        "level": 1,
+        "race": "негр",
+        "class": "воин"
+      }
+    ],
+    "npcs": [
+      {
+        "id": "2206e4ba-a8f0-4fcc-b161-8d122f57ff1e",
+        "name": "фывфывqwe",
+        "level": 1,
+        "race": "фыв"
+      }
+    ],
+    "partyID": "930442",
+    "locations": {},
+    "loot": [],
+    "details": ""
+  },
+  "summary": {
+    "xpGained": 0,
+    "lootCollected": [],
+    "totalEvents": 0,
+    "durationSeconds": 41
+  },
+  "logs": [],
+  "closedAt": "2025-04-18T14:09:45.818Z"
+}

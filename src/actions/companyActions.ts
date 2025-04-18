@@ -208,3 +208,39 @@ export async function getCharactersByCompany(companyId: string) {
     npcs,
   ];
 }
+
+
+export async function getMainCharacterById(id: string) {
+  return await prisma.mainCharacter.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      name: true,
+      class: true,
+      race: true,
+      description: true,
+      avatar: true,
+      level: true,
+      alive: true,
+    },
+  });
+}
+
+
+export async function getCharacterById(id: string) {
+  return await prisma.character.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      name: true,
+      class: true,
+      race: true,
+      description: true,
+      avatar: true,
+      level: true,
+      alive: true,
+      location: true,
+      occupation: true,
+    },
+  });
+}

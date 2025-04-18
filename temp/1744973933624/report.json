@@ -1,0 +1,24 @@
+{
+  "session": {
+    "name": "Новая партия егора",
+    "scenario": "aad",
+    "partyID": "930442",
+    "locations": {},
+    "loot": [],
+    "npcs": [
+      {
+        "id": "2206e4ba-a8f0-4fcc-b161-8d122f57ff1e",
+        "name": "фывфывqwe"
+      }
+    ],
+    "details": ""
+  },
+  "summary": {
+    "xpGained": 0,
+    "lootCollected": [],
+    "totalEvents": 0,
+    "durationSeconds": 927
+  },
+  "logs": [],
+  "closedAt": "2025-04-18T11:15:53.469Z"
+}

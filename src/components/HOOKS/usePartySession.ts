@@ -10,13 +10,15 @@ import {
   SessionSummary,
 } from "@/actions/party";
 import {
+  getCharacterById,
   getCompany,
+  getMainCharacterById,
   getMainCharactersByCompany,
   getNpcCharactersByCompany,
 } from "@/actions/companyActions";
 import { useParams } from "next/navigation";
 import { getSession } from "@/actions/auth";
-import { Character } from "@/utils/types/Character";
+import { Character } from "@/utils/types/CharacterType";
 import { SessionPayload } from "@/utils/types/SessionPayload";
 import { log } from "console";
 
@@ -37,19 +39,23 @@ export function usePartySession() {
 
   useEffect(() => {
     const fetchInitial = async () => {
-      const session = await getSession();
+      const session = (await getSession()) as SessionPayload;
       if (!session) return;
       setUser(session);
 
-      const companyId = Number(params.id);
+      const companyId = Number(localStorage.getItem("dnd-company-self"));
+      console.log("[usePartySession] companyId из LS:", companyId);
+
       const company = await getCompany({ id: companyId, userId: session.id });
 
+      if (!company || !company.userId) return;
+
       const [mainChars, npcChars] = await Promise.all([
-        getMainCharactersByCompany(company?.id, session.id),
-        getNpcCharactersByCompany(company?.id, session.id),
+        getMainCharactersByCompany(company.id, session.id),
+        getNpcCharactersByCompany(company.id, session.id),
       ]);
       console.log([mainChars, npcChars]);
-      
+
       const combined = [
         ...mainChars.map((c: any) => ({ ...c, type: "main" })),
         ...npcChars.map((c: any) => ({ ...c, type: "npc" })),
@@ -73,12 +79,76 @@ export function usePartySession() {
     return () => clearInterval(interval);
   }, [sessionId]);
 
-  const create = async (name: string, scenario: string) => {
+  useEffect(() => {
+    const restoreSession = async () => {
+      const savedId = localStorage.getItem("dnd-session-id");
+      if (!savedId) return;
+
+      const [fetchedLogs, timerData] = await Promise.all([
+        getLogs(savedId),
+        getTimer(savedId),
+      ]);
+
+      setSessionId(savedId);
+      setLogUrl(`http://localhost:????/log`); // или получай URL в LS, если хочешь
+      setTimerUrl(`http://localhost:????/timer`);
+      setLogs(fetchedLogs);
+      setTimer(timerData);
+    };
+
+    restoreSession();
+  }, []);
+  const create = async (
+    name: string,
+    scenario: string,
+    extras?: { loot?: string[]; locations?: Record<string, string> }
+  ) => {
+    const mainCharactersIds = selectedCharacters
+      .filter((c) => c.type === "main")
+      .map((c) => c.id);
+  
+    const npcIds = selectedCharacters
+      .filter((c) => c.type === "npc")
+      .map((c) => c.id);
+  
+    // 👉 Запрашиваем полные данные из БД
+    const [mainChars, npcChars] = await Promise.all([
+      Promise.all(mainCharactersIds.map(id => getMainCharacterById(id))),
+      Promise.all(npcIds.map(id => getCharacterById(id))),
+    ]);
+  
+    const mainCharacters = mainChars.map((c: any) => ({
+      id: c.id,
+      name: c.name,
+      class: c.class,
+      race: c.race,
+      description: c.description || "",
+      alive: c.alive !== undefined ? c.alive : true,
+      level: c.level,
+    }));
+  
+    const npcs = npcChars.map((c: any) => ({
+      id: c.id,
+      name: c.name,
+      class: c.class,
+      race: c.race,
+      description: c.description || "",
+      alive: c.alive !== undefined ? c.alive : true,
+      level: c.level,
+      location: c.location || "",
+      occupation: c.occupation || "",
+    }));
+  
     const data: SessionData = {
       name,
       scenario,
-      characters: selectedCharacters.map((c) => ({ id: c.id, name: c.name })),
+      partyID: params.id,
+      mainCharacters,
+      npcs,
+      loot: extras?.loot ?? {},
+      locations: extras?.locations ?? {},
     };
+  
     const { sessionId, logUrl, timerUrl } = await createSession(data);
     setSessionId(sessionId);
     setLogUrl(logUrl);
@@ -86,8 +156,10 @@ export function usePartySession() {
     setLogs([]);
     setSummary(null);
     setTimer({ isRunning: true, elapsedSeconds: 0 });
+  
+    localStorage.setItem("dnd-session-id", sessionId);
   };
-
+  
   const sendLog = async (log: LogEntry) => {
     if (!logUrl) return;
     await fetch(logUrl, {

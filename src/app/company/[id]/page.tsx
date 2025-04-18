@@ -59,6 +59,10 @@ export default function CompanyPage() {
         userId: user.id,
       });
       setCompany(data);
+      if (data?.self) {
+        localStorage.setItem("dnd-company-self", data.self.toString());
+        console.log("[CompanyPage] Сохранил self кампании в LS:", data.self);
+      }
     }
     fetchCompany();
   }, [user]);

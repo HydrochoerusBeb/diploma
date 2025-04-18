@@ -1,0 +1,34 @@
+{
+  "session": {
+    "name": "Новая партия егора",
+    "scenario": "fdsazd",
+    "mainCharacters": [
+      {
+        "id": "656e64ca-40f1-437d-88a4-f27d4eccd408",
+        "name": "Арсен",
+        "class": "воин",
+        "race": "негр",
+        "description": "долбаеб никто его не любит вообще",
+        "alive": true,
+        "level": 1
+      }
+    ],
+    "npcs": [],
+    "partyID": "930442",
+    "locations": {
+      "adsasdad": "asdad"
+    },
+    "loot": [
+      "aseda: asdad"
+    ],
+    "details": ""
+  },
+  "summary": {
+    "xpGained": 0,
+    "lootCollected": [],
+    "totalEvents": 0,
+    "durationSeconds": 15
+  },
+  "logs": [],
+  "closedAt": "2025-04-18T17:43:41.952Z"
+}

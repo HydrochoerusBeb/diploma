@@ -1,0 +1,34 @@
+{
+  "session": {
+    "name": "Новая партия егора",
+    "scenario": "asdasd",
+    "mainCharacters": [
+      {
+        "id": "41cc2d86-a5b2-490a-9ef7-37825e3d946c",
+        "name": "фывфыв"
+      }
+    ],
+    "npcs": [
+      {
+        "id": "2206e4ba-a8f0-4fcc-b161-8d122f57ff1e",
+        "name": "фывфывqwe"
+      }
+    ],
+    "partyID": "930442",
+    "locations": {
+      "": ""
+    },
+    "loot": [
+      ""
+    ],
+    "details": ""
+  },
+  "summary": {
+    "xpGained": 0,
+    "lootCollected": [],
+    "totalEvents": 0,
+    "durationSeconds": 594
+  },
+  "logs": [],
+  "closedAt": "2025-04-18T11:38:35.066Z"
+}

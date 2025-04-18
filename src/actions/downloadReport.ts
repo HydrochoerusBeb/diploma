@@ -10,7 +10,7 @@ export async function downloadReport(sessionId: string): Promise<string | null> 
 
   try {
     const file = await fs.readFile(reportPath);
-    return file.toString('base64'); // 🔥 кодируем в base64
+    return file.toString('base64');
   } catch (err) {
     console.error(`Не удалось прочитать report.json для sessionId=${sessionId}`, err);
     return null;
