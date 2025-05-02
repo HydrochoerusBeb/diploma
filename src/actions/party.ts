@@ -5,7 +5,6 @@ import { promisify } from 'util';
 import net from 'net';
 import fs from 'fs/promises';
 import path from 'path';
-import prisma from '@/lib/prisma';
 
 export interface SessionData {
   name: string;

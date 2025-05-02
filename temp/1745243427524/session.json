@@ -1,0 +1,36 @@
+{
+  "name": "Тестовая партия",
+  "scenario": "udjy",
+  "mainCharacters": [
+    {
+      "id": "51339b8d-c792-48c0-a1d9-1285513b85ab",
+      "name": "Новый персонаж",
+      "class": "Воин",
+      "race": "Эльф",
+      "description": "Новый персонаж",
+      "alive": true,
+      "level": 1
+    }
+  ],
+  "npcs": [
+    {
+      "id": "4247739f-45de-4b50-9a43-7f88526a6b34",
+      "name": "Новый неигровой персонаж",
+      "class": "Воин",
+      "race": "Эльф",
+      "description": "Новый персонаж",
+      "alive": true,
+      "level": 1,
+      "location": "Таверна",
+      "occupation": "Торговец"
+    }
+  ],
+  "partyID": "101464",
+  "locations": {
+    "sdfsf": "asdasd"
+  },
+  "loot": {
+    "jsdf": "qsadd"
+  },
+  "details": ""
+}

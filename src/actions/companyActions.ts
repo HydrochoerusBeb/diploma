@@ -171,7 +171,6 @@ export async function getMainCharactersByCompany(compainId: string, userId: stri
   });
 }
 
-// Получить всех NPC персонажей кампании
 export async function getNpcCharactersByCompany(compainId: string, userId: string) {
   return await prisma.character.findMany({
     where: {

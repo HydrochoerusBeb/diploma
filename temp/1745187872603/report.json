@@ -1,0 +1,47 @@
+{
+  "session": {
+    "name": "Тестовая партия",
+    "scenario": "Тестовый сценарий",
+    "mainCharacters": [
+      {
+        "id": "51339b8d-c792-48c0-a1d9-1285513b85ab",
+        "name": "Новый персонаж",
+        "class": "Воин",
+        "race": "Эльф",
+        "description": "Новый персонаж",
+        "alive": false,
+        "level": 5
+      }
+    ],
+    "npcs": [
+      {
+        "id": "4247739f-45de-4b50-9a43-7f88526a6b34",
+        "name": "Новый неигровой персонаж",
+        "class": "Воин",
+        "race": "Эльф",
+        "description": "Новый персонаж",
+        "alive": true,
+        "level": 1,
+        "location": "Таверна",
+        "occupation": "Торговец"
+      }
+    ],
+    "partyID": "101464",
+    "locations": {
+      "Таверна": "крутая таверна"
+    },
+    "loot": {
+      "Пинта эля": "1 золотая ",
+      "Посох": "15 золотых"
+    },
+    "details": "ТПК, все персонажи мертвы"
+  },
+  "summary": {
+    "xpGained": 0,
+    "lootCollected": [],
+    "totalEvents": 0,
+    "durationSeconds": 52
+  },
+  "logs": [],
+  "closedAt": "2025-04-20T22:25:26.522Z"
+}

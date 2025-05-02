@@ -1,3 +1,0 @@
-{"type":"event","timestamp":"2025-04-17T10:01:34.290Z","message":"aasdasd"}
-{"type":"loot","timestamp":"2025-04-17T10:01:39.373Z","message":"asdasdasd"}
-{"type":"combat","timestamp":"2025-04-17T10:01:44.724Z","message":"asdasdasd"}

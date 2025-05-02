@@ -160,13 +160,13 @@ export default function CompanyPage() {
                 placeholder="Название партии"
                 value={partyTitle}
                 onChange={(e) => setPartyTitle(e.target.value)}
-                className="w-full p-2 border rounded my-2"
+                className="w-full p-2 border text-black rounded my-2"
               />
               <textarea
                 placeholder="Описание партии"
                 value={partyDescription}
                 onChange={(e) => setPartyDescription(e.target.value)}
-                className="w-full p-2 border rounded my-2"
+                className="w-full p-2 border rounded my-2 text-black"
               />
               <Button
                 onPress={() => {
@@ -204,31 +204,31 @@ export default function CompanyPage() {
             </div>
 
             <input
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded text-black"
               placeholder="Имя"
               value={charName}
               onChange={(e) => setCharName(e.target.value)}
             />
             <input
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded text-black"
               placeholder="Класс"
               value={charClass}
               onChange={(e) => setCharClass(e.target.value)}
             />
             <input
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded text-black"
               placeholder="Раса"
               value={charRace}
               onChange={(e) => setCharRace(e.target.value)}
             />
             <input
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded text-black"
               placeholder="Описание"
               value={charDesc}
               onChange={(e) => setCharDesc(e.target.value)}
             />
             <input
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded text-black"
               placeholder="Уровень"
               type="number"
               value={charLevel}
@@ -238,13 +238,13 @@ export default function CompanyPage() {
             {charType === "npc" && (
               <>
                 <input
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border rounded text-black"
                   placeholder="Локация"
                   value={npcLocation}
                   onChange={(e) => setNpcLocation(e.target.value)}
                 />
                 <input
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border rounded text-black"
                   placeholder="Роль"
                   value={npcOccupation}
                   onChange={(e) => setNpcOccupation(e.target.value)}
@@ -255,7 +255,7 @@ export default function CompanyPage() {
             <div className="flex justify-between pt-2">
               <Button onClick={() => setCharModalOpen(false)}>Отмена</Button>
               <Button
-                className="bg-green-600 text-white"
+                className="bg-green-600 text-black"
                 onClick={handleCreateCharacter}
               >
                 Создать

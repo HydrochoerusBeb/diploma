@@ -67,13 +67,13 @@ export default function Companies() {
             placeholder="Название компании"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full p-2 mb-2 border rounded-lg"
+            className="w-full p-2 mb-2 border rounded-lg text-black"
           />
           <textarea
             placeholder="Описание компании"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full p-2 mb-2 border rounded-lg"
+            className="w-full p-2 mb-2 border rounded-lg text-black"
           ></textarea>
           <button
             onClick={handleSubmit}
